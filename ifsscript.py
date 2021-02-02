@@ -12,8 +12,8 @@ import cv2 as cv
 import numpy as np
 from PIL import Image, ImageDraw
 
-import PortalTools
-import SplitTools
+import PortalUtils
+import SplitUtils
 
 
 def create_config(filename):
@@ -91,11 +91,11 @@ async def crop(img, rect):
 async def solver(config):
     sc = config['solver_config']
     thresh = (sc['threshold_down'], sc['threshold_up'])
-    rect_list = await asyncio.to_thread(SplitTools.getPhotoContours, sc['target'], sc['y_start'], sc['y_end'], thresh)
+    rect_list = await asyncio.to_thread(SplitUtils.getPhotoContours, sc['target'], sc['y_start'], sc['y_end'], thresh)
     await asyncio.to_thread(drawSpiltResult, sc['spilt_result'], sc['target'], rect_list)
-    map_ = await asyncio.to_thread(SplitTools.getPhotoMap, rect_list)
+    map_ = await asyncio.to_thread(SplitUtils.getPhotoMap, rect_list)
     img = await asyncio.to_thread(Image.open, sc['target'])
-    hash_db = await PortalTools.ImageHashDatabase.create(config['portals_csv'], config['portals_image_dir'])
+    hash_db = await PortalUtils.ImageHashDatabase.create(config['portals_csv'], config['portals_image_dir'])
     canvas = await asyncio.to_thread(Canvas.create, map_)
 
     for n, col in enumerate(map_):
@@ -139,13 +139,13 @@ if __name__ == '__main__':
 
     async def update():
         print('[!] 开始更新元数据...')
-        await PortalTools.crawl(config['cookies'], config['map_config'], config['portals_csv'])
+        await PortalUtils.crawl(config['cookies'], config['map_config'], config['portals_csv'])
         print('')
 
 
     async def download():
         print('[!] 开始下载Intel上的图像...')
-        pd = PortalTools.PortalImageDownloader(config['portals_image_dir'])
+        pd = PortalUtils.PortalImageDownloader(config['portals_image_dir'])
         await pd.download_from_csv(config['portals_csv'])
         print('')
 
