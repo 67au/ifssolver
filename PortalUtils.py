@@ -21,6 +21,7 @@ class PortalsCSV(object):
     @staticmethod
     def write_csv(portals_csv, poInfo_list):
         portals_csv = Path(portals_csv)
+        portals_csv.parent.mkdir(parents=True, exist_ok=True)
         portals_csv.touch(exist_ok=True)
         with open(str(portals_csv), 'w', newline='', encoding='utf-8') as csvfile:
             fieldnames = ['name', 'lat', 'lng', 'url', 'uid']
@@ -97,7 +98,7 @@ class PortalImageDownloader(object):
 
     def __init__(self, dirname):
         self.img_dir = Path(dirname)
-        self.img_dir.mkdir(exist_ok=True)
+        self.img_dir.mkdir(parents=True, exist_ok=True)
 
     async def __download_img(self, client, portal):
         img_path = self.img_dir.joinpath(f"{portal['lng']}_{portal['lat']}.jpg")
