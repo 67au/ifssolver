@@ -33,8 +33,7 @@ def create_config(filename):
     config['solver_config']['y_end'] = config_raw.getint('Solver', 'Y_END')
     config['solver_config']['output'] = config_raw.get('Solver', 'OUTPUT', raw=True)
     config['solver_config']['spilt_result'] = config_raw.get('Solver', 'SPILT_RESULT', raw=True)
-    config['solver_config']['threshold_up'] = config_raw.getint('Solver', 'THRESHOLD_UP')
-    config['solver_config']['threshold_down'] = config_raw.getint('Solver', 'THRESHOLD_DOWN')
+    config['solver_config']['thresh'] = config_raw.getint('Solver', 'THRESH')
     return config
 
 
@@ -88,10 +87,17 @@ async def crop(img, rect):
     return await asyncio.to_thread(img.crop, (x, y, x + h - 1, y + w - 1))
 
 
+async def spilt(config):
+    sc = config['solver_config']
+    rect_list = await asyncio.to_thread(SplitUtils.getPhotoContours,
+                                        sc['target'], sc['y_start'], sc['y_end'], sc['thresh'])
+    await asyncio.to_thread(drawSpiltResult, sc['spilt_result'], sc['target'], rect_list)
+
+
 async def solver(config):
     sc = config['solver_config']
-    thresh = (sc['threshold_down'], sc['threshold_up'])
-    rect_list = await asyncio.to_thread(SplitUtils.getPhotoContours, sc['target'], sc['y_start'], sc['y_end'], thresh)
+    rect_list = await asyncio.to_thread(SplitUtils.getPhotoContours,
+                                        sc['target'], sc['y_start'], sc['y_end'], sc['thresh'])
     await asyncio.to_thread(drawSpiltResult, sc['spilt_result'], sc['target'], rect_list)
     map_ = await asyncio.to_thread(SplitUtils.getPhotoMap, rect_list)
     img = await asyncio.to_thread(Image.open, sc['target'])
@@ -101,7 +107,8 @@ async def solver(config):
     for n, col in enumerate(map_):
         print(f'[!] 正在处理第{n+1}列图像中...')
         result = [await hash_db.match(await crop(img, rect_list[num])) for num in col]
-        await asyncio.to_thread(canvas.drawGlyph, n, result)
+        if any(result):
+            await asyncio.to_thread(canvas.drawGlyph, n, result)
         if None in result:
             await asyncio.to_thread(canvas.drawUnderline, n)
             row_notfound = ','.join(str(n) for n, r in enumerate(result) if r is None)
@@ -122,7 +129,8 @@ if __name__ == '__main__':
     group1.add_argument('-b', '--both', help='Both update and download', action='store_true')
 
     group2 = parser.add_mutually_exclusive_group()
-    group2.add_argument('-s', '--solve', help='Get passcode from picture automatically', action='store_true')
+    group2.add_argument('--spilt', help='Spilt picture only', action='store_true')
+    group2.add_argument('--solve', help='Get passcode from picture automatically', action='store_true')
 
     args = parser.parse_args()
 
@@ -166,4 +174,9 @@ if __name__ == '__main__':
         print('[!] 开始自动处理')
         start = time.time()
         asyncio.run(solver(config))
+        print(f'[!] 自动处理完成，用时 {time.time() - start} s')
+    elif args.spilt:
+        print('[!] 开始自动处理')
+        start = time.time()
+        asyncio.run(spilt(config))
         print(f'[!] 自动处理完成，用时 {time.time() - start} s')
