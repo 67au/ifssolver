@@ -94,7 +94,7 @@ class PortalImageDownloader(object):
         'User-Agent':
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36'
     }
-    limits = httpx.Limits(max_keepalive_connections=12, max_connections=30)
+    limits = httpx.Limits(max_keepalive_connections=20, max_connections=40)
 
     def __init__(self, dirname):
         self.img_dir = Path(dirname)
