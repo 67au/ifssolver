@@ -2,4 +2,5 @@ opencv-python~=4.5.3.56
 aiofiles~=0.7.0
 httpx~=0.19.0
 httpx-socks~=0.4.1
+async-timeout~=3.0.1
 tqdm~=4.62.3
