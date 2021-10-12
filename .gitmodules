@@ -1,0 +1,3 @@
+[submodule "intelmapclient"]
+	path = intelmapclient
+	url = https://git.qvq.network/FQEGG/intelmapclient.git
