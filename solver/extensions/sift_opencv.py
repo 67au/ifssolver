@@ -9,18 +9,18 @@ from ..types import PathType, FeatureType, MatchType
 
 
 class SIFTUtils:
-    _sift = cv.SIFT_create()
 
-    @classmethod
-    def get_image_features(cls,
+    def __init__(self):
+        self._sift = cv.SIFT_create()
+
+    def get_image_features(self,
                            image_path: PathType,
                            ) -> FeatureType:
         image = cv.imread(str(image_path), cv.IMREAD_GRAYSCALE)
-        kp, des = cls._sift.detectAndCompute(image, None)
+        kp, des = self._sift.detectAndCompute(image, None)
         return kp, des
 
-    @classmethod
-    def get_cache_features(cls,
+    def get_cache_features(self,
                            cache_path: PathType,
                            pack: bool = False,
                            ) -> Union[FeatureType, 'np.ndarray']:
@@ -30,8 +30,7 @@ class SIFTUtils:
         kp, des = FeatureUtils.unpack_features(features)
         return kp, des
 
-    @classmethod
-    def get_features(cls,
+    def get_features(self,
                      image_path: PathType,
                      feature_dir: PathType,
                      save_cache: bool = True,
@@ -45,14 +44,14 @@ class SIFTUtils:
             if cache_path.exists():
                 try:
                     if pack:
-                        features = cls.get_cache_features(cache_path, pack)
+                        features = self.get_cache_features(cache_path, pack)
                         return features
-                    kp, des = cls.get_cache_features(cache_path)
+                    kp, des = self.get_cache_features(cache_path)
                     return kp, des
                 except ValueError:
                     cache_path.unlink(missing_ok=True)
         if image_path.exists():
-            kp, des = cls.get_image_features(image_path)
+            kp, des = self.get_image_features(image_path)
             feature_dir.mkdir(exist_ok=True, parents=True)
             cache_path = feature_dir.joinpath(f'{image_path.name}.npy')
             features = None

@@ -11,24 +11,36 @@ from ..types import PathType
 
 class SIFTUtils:
 
-    @classmethod
-    def get_image_features(cls,
+    def __init__(self,
+                 devicetype: str = 'all',
+                 platformid: int = None,
+                 deviceid: int = None
+                 ):
+        self.devicetype = devicetype
+        self.platformid = platformid
+        self.deviceid = deviceid
+
+    def get_image_features(self,
                            image_path: PathType,
                            ) -> np.recarray:
         image = cv.imread(str(image_path))
-        siftp = sift.SiftPlan(template=image, devicetype='all', init_sigma=1.2)
+        siftp = sift.SiftPlan(
+            template=image,
+            init_sigma=1.2,
+            devicetype=self.devicetype,
+            platformid=self.platformid,
+            deviceid=self.deviceid,
+        )
         kp = siftp.keypoints(image)
         return kp
 
-    @classmethod
-    def get_cache_features(cls,
+    def get_cache_features(self,
                            cache_path: PathType,
                            ) -> np.recarray:
         kp = FeatureUtils.load_features(cache_path)
         return kp
 
-    @classmethod
-    def get_features(cls,
+    def get_features(self,
                      image_path: PathType,
                      feature_dir: PathType,
                      save_cache: bool = True,
@@ -40,12 +52,12 @@ class SIFTUtils:
             cache_path = feature_dir.joinpath(f'{image_path.name}.npy')
             if cache_path.exists():
                 try:
-                    kp = cls.get_cache_features(cache_path)
+                    kp = self.get_cache_features(cache_path)
                     return kp
                 except ValueError:
                     cache_path.unlink(missing_ok=True)
         if image_path.exists():
-            kp = cls.get_image_features(image_path)
+            kp = self.get_image_features(image_path)
             feature_dir.mkdir(exist_ok=True, parents=True)
             cache_path = feature_dir.joinpath(f'{image_path.name}.npy')
             if save_cache and not (cache_path.exists() and no_clean):
@@ -56,8 +68,15 @@ class SIFTUtils:
 
 class SIFTMatcher:
 
-    def __init__(self):
-        self._sift = sift.MatchPlan(devicetype='all')
+    def __init__(self,
+                 devicetype: str = 'all',
+                 platformid: int = None,
+                 deviceid: int = None
+                 ):
+        self._sift = sift.MatchPlan(
+            devicetype=devicetype,
+            device=(platformid, deviceid)
+        )
 
     def get_centers(self,
                     src_image: np.ndarray,

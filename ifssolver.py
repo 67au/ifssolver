@@ -90,12 +90,15 @@ def read_match_result(filename: PathType):
 def split_picture(config, no_clean: bool = False, save_cache: bool = True, method: str = 'opencv'):
     if method == 'silx':
         from solver.extensions.sift_silx import SIFTUtils, SIFTMatcher
-        compute_utils = SIFTUtils
-        matcher = SIFTMatcher()
+        devicetype = config.get('silx', 'devicetype', fallback='all')
+        platformid = config.getint('silx', 'platformid', fallback=None)
+        deviceid = config.getint('silx', 'deviceid', fallback=None)
+        compute_utils = SIFTUtils(devicetype=devicetype, platformid=platformid, deviceid=deviceid)
+        matcher = SIFTMatcher(devicetype=devicetype, platformid=platformid, deviceid=deviceid)
     elif method == 'opencv':
         logger.info('有显卡的用户推荐使用 --method silx')
         from solver.extensions.sift_opencv import SIFTUtils, BFMatcher
-        compute_utils = SIFTUtils
+        compute_utils = SIFTUtils()
         matcher = BFMatcher()
     else:
         raise
