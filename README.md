@@ -103,8 +103,8 @@ python3 ifssolver.py --auto
 
 - 只有下载地图元数据部分需要 cookies
 - 下载数据这部分使用代理的话，会被限制为单线程下载（详情请查看 [IntelMapClient](https://github.com/67au/intel-map-client) ），推荐使用使用命令行代理的方式（例如 proxychains ）
-- silx-kit 提供的算法匹配关键点数相比 opencv 提供的少，只影响 ifs 图像上缩放较小的照片，造成无法识别。（可以通过修改参数解决，但参考相关资料）
-- 使用 silx-kit 需要安装 pyopencl，指定使用 GPU 计算，但是对于多显卡没有将接口暴露所以没法指定显卡，需要修改 solver/extensions/sift_silx.py
+- ~~silx-kit 提供的算法匹配关键点数相比 opencv 提供的少，只影响 ifs 图像上缩放较小的照片，造成无法识别。（可以通过修改参数解决，但参考相关资料）~~ [[查看 commit]](https://github.com/67au/ifssolver/commit/b93b53969edc8dd55147f687c27e6c992eb4ad72)
+- 使用 silx-kit 需要安装 pyopencl，指定使用 GPU 计算，~~但是对于多显卡没有将接口暴露所以没法指定显卡，需要修改 solver/extensions/sift_silx.py~~ [[查看 commit]](https://github.com/67au/ifssolver/commit/6e690eb4087d91acc4dbcccea41fdc4b0f25366b)
 - opencv 提供的算法是基于 CPU 计算
 
 ## 致谢
