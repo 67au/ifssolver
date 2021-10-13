@@ -68,6 +68,8 @@ async def download_images(config, no_clean: bool):
     metadata_csv = Path(config.get('common', 'TEMP_DIR')).joinpath('metadata.csv')
     image_dir = Path(config.get('common', 'TEMP_DIR')).joinpath('images')
     proxy = config.get('proxy', 'url') if config.getboolean('proxy', 'enable') else None
+    if proxy is not None:
+        logger.info('如果使用代理，将会限制连接数为1，详情查看 https://github.com/encode/httpcore/issues/335')
     await PortalUtils.download_portals_by_csv(metadata_csv, image_dir, proxy=proxy, no_clean=no_clean, max_worker=20)
 
 

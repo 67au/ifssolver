@@ -71,7 +71,7 @@ class PortalUtils:
         portal_list = await loop.run_in_executor(None, cls.read_portals_from_csv, source_csv)
         target_dir = Path(target_dir)
         target_dir.mkdir(exist_ok=True, parents=True)
-        semaphore = asyncio.Semaphore(max_worker)
+        semaphore = asyncio.Semaphore(max_worker) if proxy is None else asyncio.Semaphore(1)
         async with httpx.AsyncClient(
                 headers={
                     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
