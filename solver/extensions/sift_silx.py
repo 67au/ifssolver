@@ -16,7 +16,7 @@ class SIFTUtils:
                            image_path: PathType,
                            ) -> np.recarray:
         image = cv.imread(str(image_path))
-        siftp = sift.SiftPlan(template=image, devicetype='GPU')
+        siftp = sift.SiftPlan(template=image, devicetype='all', init_sigma=1.2)
         kp = siftp.keypoints(image)
         return kp
 
@@ -57,7 +57,7 @@ class SIFTUtils:
 class SIFTMatcher:
 
     def __init__(self):
-        self._sift = sift.MatchPlan(devicetype='GPU')
+        self._sift = sift.MatchPlan(devicetype='all')
 
     def get_centers(self,
                     src_image: np.ndarray,
@@ -71,7 +71,7 @@ class SIFTMatcher:
             src_des, dst_des = matches[:, 0], matches[:, 1]
             src_pts = src_des[['x', 'y']].astype([('x', '<f8'), ('y', '<f8')]).view('<f8').reshape(-1, 2)
             dst_pts = dst_des[['x', 'y']].astype([('x', '<f8'), ('y', '<f8')]).view('<f8').reshape(-1, 2)
-            M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC, 20.0)
+            M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC, 35.0)
             h, w, _ = src_image.shape
             pts = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
             if M is None:

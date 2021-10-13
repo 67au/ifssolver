@@ -90,7 +90,7 @@ class BFMatcher:
         for _ in iter(lambda: len(matches) < 4, True):
             src_pts = np.float32([src_kp[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
             dst_pts = np.float32([dst_kp[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
-            M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC, 20.0)
+            M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC, 35.0)
             h, w, _ = src_image.shape
             pts = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
             if M is None:
