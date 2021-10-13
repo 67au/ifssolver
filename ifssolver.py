@@ -89,11 +89,12 @@ def split_picture(config, no_clean: bool = False, save_cache: bool = True, metho
     if method == 'silx':
         from solver.extensions.sift_silx import SIFTUtils, SIFTMatcher
         compute_utils = SIFTUtils
-        matcher = SIFTMatcher
+        matcher = SIFTMatcher()
     elif method == 'opencv':
+        logger.info('有显卡的用户推荐使用 --method silx')
         from solver.extensions.sift_opencv import SIFTUtils, BFMatcher
         compute_utils = SIFTUtils
-        matcher = BFMatcher
+        matcher = BFMatcher()
     else:
         raise
 
@@ -121,7 +122,6 @@ def split_picture(config, no_clean: bool = False, save_cache: bool = True, metho
                                                 save_cache=save_cache)
 
     logger.info('计算 Portal 图像')
-    matcher = matcher()
     result_list = []
     x_list = []
     y_list = []
@@ -167,7 +167,7 @@ def draw_result(config, print_: bool = True):
     passcode_jpg = output_dir.joinpath('passcode.jpg')
     DrawUtils.get_passcode(lnglat_list, str(passcode_jpg))
     print(f'结果已输出到 {str(output_dir)}，结合匹配情况对比目标图像判断，以修正记录：')
-    print('\n'.join((f' 第 {n+1:2} 列匹配个数: {len(l):2}' for n, l in lnglat_list)))
+    print('\n'.join((f' 第 {n+1:2} 列匹配个数: {len(l):2}' for n, l in sorted(lnglat_list, key=lambda k: k[0]))))
 
 
 def main():
