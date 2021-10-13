@@ -106,3 +106,11 @@ python3 ifssolver.py --auto
 - silx-kit 提供的算法匹配关键点数相比 opencv 提供的少，只影响 ifs 图像上缩放较小的照片，造成无法识别。（可以通过修改参数解决，但参考相关资料）
 - 使用 silx-kit 需要安装 pyopencl，指定使用 GPU 计算，但是对于多显卡没有将接口暴露所以没法指定显卡，需要修改 solver/extensions/sift_silx.py
 - opencv 提供的算法是基于 CPU 计算
+
+## 致谢
+
+- [@ROrdo](https://github.com/RogerRordo) 
+- [UESTC-Ingress/IFSolver](https://github.com/UESTC-Ingress/IFSolver)
+- [pierrepaleo/sift_pyocl](https://github.com/pierrepaleo/sift_pyocl)
+- [opencv: Introduction to SIFT (Scale-Invariant Feature Transform)](https://docs.opencv.org/4.5.4/da/df5/tutorial_py_sift_intro.html)
+- [opencv: Feature Matching + Homography to find Objects](https://docs.opencv.org/4.5.4/d1/de0/tutorial_py_feature_homography.html)
