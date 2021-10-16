@@ -77,7 +77,9 @@ class PortalUtils:
                     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                                   'Chrome/93.0.4577.82 Safari/537.36'},
                 transport=httpx.AsyncHTTPTransport(retries=1) if proxy is None else
-                AsyncProxyTransport.from_url(proxy, retries=1)) as client:
+                AsyncProxyTransport.from_url(proxy, retries=1),
+                timeout=httpx.Timeout(10, read=30)
+            ) as client:
             tasks = [
                 asyncio.create_task(
                     cls._fetch_image_url(semaphore, client, target_dir.joinpath(parse_portal_filename(
