@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Iterable
 
 import cv2 as cv
+import numpy as np
 import tqdm
 import tqdm.contrib.concurrent
 
@@ -128,8 +129,6 @@ def split_picture(config, no_clean: bool = False, save_cache: bool = True, metho
 
     logger.info('计算 Portal 图像')
     result_list = []
-    x_list = []
-    y_list = []
     for n, p in enumerate(tqdm.tqdm(portals)):
         portal_image_path = images_dir.joinpath(parse_portal_filename(
             lat=p['lat'], lng=p['lng'], image_url=p['image']
@@ -145,9 +144,8 @@ def split_picture(config, no_clean: bool = False, save_cache: bool = True, metho
         if any(centers):
             for x, y in centers:
                 result_list.append((x, y, n))
-                x_list.append(x)
-                y_list.append(y)
-    grid_list = GridUtils.grid_sort(x_list, y_list, config.getint('ifs', 'COLUMN'))
+    xy_array = np.array(result_list)[:, 0:2]
+    grid_list = GridUtils.grid_sort(xy_array, config.getint('ifs', 'COLUMN'))
     result_iter = ((k, n, result_list[val][0], result_list[val][1], portals[result_list[val][2]]['title'],
                     portals[result_list[val][2]]['lat'], portals[result_list[val][2]]['lng'],
                     portals[result_list[val][2]]['image'])
