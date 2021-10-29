@@ -42,7 +42,8 @@ class PortalUtils:
             radian_meter=radian_meter,
             zoom=15,
         )
-        tile_container = await AsyncAPI.getEntitiesByTiles(client, map_tiles)
+        api = AsyncAPI(client)
+        tile_container = await api.getEntitiesByTiles(map_tiles)
         return tile_container.portals()
 
     @classmethod
