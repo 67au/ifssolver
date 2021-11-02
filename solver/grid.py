@@ -18,6 +18,6 @@ class GridUtils:
         grid = defaultdict(list)
         for n, m in enumerate(label.ravel()):
             grid[m].append(n)
-        return [sorted(v, key=lambda k: xy_array[:, 0].astype(np.float32).ravel()[k])
+        return [sorted(v, key=lambda k: xy_array[:, 1].astype(np.float32).ravel()[k])
                 for v in sorted(grid.values(), key=lambda k: x_array.ravel()[k[0]])]
 
