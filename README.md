@@ -107,6 +107,28 @@ python3 ifssolver.py --auto
 - 使用 silx-kit 需要安装 pyopencl，指定使用 GPU 计算，~~但是对于多显卡没有将接口暴露所以没法指定显卡，需要修改 solver/extensions/sift_silx.py~~ [[查看 commit]](https://github.com/67au/ifssolver/commit/6e690eb4087d91acc4dbcccea41fdc4b0f25366b)
 - opencv 提供的算法是基于 CPU 计算
 
+## 使用 Docker 執行
+
+- Build Docker image，建立對應目錄:
+
+```shell
+docker build . -t ifssolver:latest
+mkdir /tmp/ifs-tmp
+mkdir /tmp/ifs-output
+```
+
+- 將影像儲存在 `/tmp/ifs.jpg` (可自訂，掛載至/ifs.jpg即可)
+
+- 複製 `.env.example` 為 `.env` 檔案，編輯 `.env` 中相對應參數
+
+- 執行
+
+```shell
+docker run --rm -v /tmp/ifs-tmp:/ifs-tmp -v /tmp/ifs-output:/ifs-output -v /tmp/ifs.jpg:/ifs.jpg --env-file ./.env -it ifs
+```
+
+- 即可在 `/tmp/ifs-output` 取得結果
+
 ## 致谢
 
 - [@ROrdo](https://github.com/RogerRordo) 
