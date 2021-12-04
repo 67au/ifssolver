@@ -8,7 +8,7 @@ class ConfigProxy:
 
     def __init__(self, config: ConfigParser):
         self._config = config
-        self.cookies = self._config.get('intel_map', 'COOKIES')
+        self.cookies = self._config.get('intel_map', 'COOKIES', raw=True)
         self.lat = self._config.getfloat('intel_map', 'LAT')
         self.lng = self._config.getfloat('intel_map', 'LNG')
         self.radius = self._config.getint('intel_map', 'RADIUS')
