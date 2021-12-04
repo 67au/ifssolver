@@ -1,4 +1,4 @@
-from configparser import RawConfigParser
+from configparser import ConfigParser
 from pathlib import Path
 
 from .types import PathType
@@ -6,9 +6,9 @@ from .types import PathType
 
 class ConfigProxy:
 
-    def __init__(self, config: RawConfigParser):
+    def __init__(self, config: ConfigParser):
         self._config = config
-        self.cookies = self._config.get('intel_map', 'COOKIES')
+        self.cookies = self._config.get('intel_map', 'COOKIES', raw=True)
         self.lat = self._config.getfloat('intel_map', 'LAT')
         self.lng = self._config.getfloat('intel_map', 'LNG')
         self.radius = self._config.getint('intel_map', 'RADIUS')
@@ -68,6 +68,6 @@ class ConfigProxy:
 
     @classmethod
     def load_config(cls, config_path: PathType) -> 'ConfigProxy':
-        config = RawConfigParser()
+        config = ConfigParser()
         config.read(config_path, encoding='utf-8')
         return cls(config)
