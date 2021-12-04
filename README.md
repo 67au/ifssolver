@@ -44,6 +44,14 @@ optional arguments:
 git clone --recurse-submodules https://github.com/67au/ifssolver.git
 ```
 
+### 安装依赖
+
+推荐使用虚拟环境 [venv](https://docs.python.org/zh-cn/3/library/venv.html) 安装依赖并运行项目
+
+```shell
+pip install -r requirements.txt
+```
+
 ### 创建配置文件
 
 参考提供的 config.sample.ini ，使用 --config 参数指定配置文件，默认： 'config.ini'
