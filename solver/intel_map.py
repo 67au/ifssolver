@@ -2,9 +2,8 @@ import asyncio
 import csv
 import logging
 import sys
-from collections.abc import Iterator
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Iterator
 
 import aiofiles
 import httpx

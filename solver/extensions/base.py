@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Union
+from typing import Union, List, Tuple
 
 import cv2 as cv
 import numpy as np
@@ -53,25 +53,25 @@ class FeatureExtractor:
 class FeatureMatcher:
 
     def get_match_contours(self,
-                           src_shape: tuple[int, int, int],
+                           src_shape: Tuple[int, int, int],
                            src_features: FeaturesType,
                            dst_features: FeaturesType,
-                           ) -> list[np.ndarray]:
+                           ) -> List[np.ndarray]:
         pass
 
 
 class Matches:
 
-    def __init__(self, matches: Union[list[cv.DMatch], np.recarray, np.ndarray]):
+    def __init__(self, matches: Union[List[cv.DMatch], np.recarray, np.ndarray]):
         self._matches = matches
         self._dst_contours = []
 
     @property
-    def matches(self) -> Union[list[cv.DMatch], np.recarray, np.ndarray]:
+    def matches(self) -> Union[List[cv.DMatch], np.recarray, np.ndarray]:
         return self._matches
 
     @property
-    def dst_contours(self) -> list[np.ndarray]:
+    def dst_contours(self) -> List[np.ndarray]:
         return self._dst_contours
 
     def update(self,

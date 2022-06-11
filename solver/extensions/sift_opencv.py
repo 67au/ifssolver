@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Tuple, List
 
 import cv2 as cv
 import numpy as np
@@ -44,10 +44,10 @@ class BFMatcher(FeatureMatcher):
         self._matcher = cv.BFMatcher_create()
 
     def get_match_contours(self,
-                           src_shape: tuple[int, int, int],
+                           src_shape: Tuple[int, int, int],
                            src_features: FeaturesType,
                            dst_features: FeaturesType,
-                           ) -> list[np.ndarray]:
+                           ) -> List[np.ndarray]:
         src_kp, src_des = src_features
         dst_kp, dst_des = dst_features
         h, w, _ = src_shape

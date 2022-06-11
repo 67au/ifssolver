@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Tuple, List
 
 import cv2 as cv
 import numpy as np
@@ -65,10 +65,10 @@ class SiftMatcher(FeatureMatcher):
         )
 
     def get_match_contours(self,
-                           src_shape: tuple[int, int, int],
+                           src_shape: Tuple[int, int, int],
                            src_features: FeaturesType,
                            dst_features: FeaturesType,
-                           ) -> list[np.ndarray]:
+                           ) -> List[np.ndarray]:
         h, w, _ = src_shape
         src_cnt = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
         matches = Matches(self._matcher.match(src_features, dst_features))
