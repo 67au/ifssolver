@@ -79,7 +79,7 @@ class Matches:
                dst_pts: np.ndarray,
                src_cnt: np.ndarray,
                ) -> bool:
-        M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC, 5.0)
+        M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC, 10.0)
         if M is None:
             return False
         dst = cv.perspectiveTransform(src_cnt, M)

@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import Union, Tuple, List
 
 import cv2 as cv
@@ -23,18 +24,25 @@ class SiftExtractor(FeatureExtractor):
         self.platformid = platformid
         self.deviceid = deviceid
 
+    @lru_cache(maxsize=32)
+    def _create_sift_plan(self, shape, dtype) -> sift.SiftPlan:
+        return sift.SiftPlan(
+            shape=shape,
+            dtype=dtype,
+            devicetype=self.devicetype,
+            platformid=self.platformid,
+            deviceid=self.deviceid
+        )
+
     def get_image_features(self,
                            image_path: PathType,
                            **kwargs
                            ) -> FeaturesType:
         image = cv.imread(str(image_path), cv.IMREAD_GRAYSCALE)
-        siftp = sift.SiftPlan(
-            template=image,
-            init_sigma=1,
-            devicetype=self.devicetype,
-            platformid=self.platformid,
-            deviceid=self.deviceid
-        )
+        if max(image.shape) > 768:
+            siftp = self._create_sift_plan.__wrapped__(self, image.shape, image.dtype)
+        else:
+            siftp = self._create_sift_plan(image.shape, image.dtype)
         return siftp.keypoints(image)
 
     def get_cache_features(self,
@@ -59,7 +67,6 @@ class SiftMatcher(FeatureMatcher):
                  deviceid: int = None
                  ):
         self._matcher = sift.MatchPlan(
-            size=65536,
             devicetype=devicetype,
             device=(platformid, deviceid),
         )
@@ -71,11 +78,25 @@ class SiftMatcher(FeatureMatcher):
                            ) -> List[np.ndarray]:
         h, w, _ = src_shape
         src_cnt = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
-        matches = Matches(self._matcher.match(src_features, dst_features))
-        while len(matches.matches) >= 4:
-            src_des, dst_des = matches.matches[:, 0], matches.matches[:, 1]
+        dst_contours = []
+        kp = dst_features
+        while True:
+            matches = self._matcher.match(src_features, kp)
+            if len(matches) < 4:
+                break
+            src_des, dst_des = matches[:, 0], matches[:, 1]
             src_pts = src_des[['x', 'y']].astype([('x', '<f4'), ('y', '<f4')]).view('<f4').reshape(-1, 2)
             dst_pts = dst_des[['x', 'y']].astype([('x', '<f4'), ('y', '<f4')]).view('<f4').reshape(-1, 2)
-            if not matches.update(src_pts, dst_pts, src_cnt):
+            M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC, 10.0)
+            if M is None:
                 break
-        return matches.dst_contours
+            dst = cv.perspectiveTransform(src_cnt, M)
+            s = cv.matchShapes(src_cnt, dst, cv.CONTOURS_MATCH_I1, 0.000)
+            if s < 0.05:
+                dst_contours.append(np.int32(dst))
+            x_max, x_min = dst[:, :, 0].max(), dst[:, :, 0].min()
+            y_max, y_min = dst[:, :, 1].max(), dst[:, :, 1].min()
+            kp = kp[np.where(np.logical_not(
+                np.logical_and.reduce((kp.x < x_max, kp.x > x_min, kp.y < y_max, kp.y > y_min))))]
+
+        return dst_contours

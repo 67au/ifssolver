@@ -72,5 +72,6 @@ if __name__ == '__main__':
         format='%(asctime)s %(message)s',
     )
     logging.getLogger('silx.opencl.sift.plan').disabled = True
+    logging.getLogger('silx.opencl.sift.match').disabled = True
     logging.getLogger('silx.opencl.processing').disabled = True
     main()

@@ -6,5 +6,5 @@ import numpy as np
 
 PathType = Union[Path, str]
 KeypointsType = List[Union[cv.KeyPoint, np.recarray]]
-FeaturesType = Union[Tuple[KeypointsType, np.ndarray], List[np.recarray]]
+FeaturesType = Union[Tuple[KeypointsType, np.ndarray], np.recarray]
 PackType = np.ndarray
