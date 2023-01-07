@@ -103,6 +103,7 @@ class Solver:
         errors_list = []
         with logging_redirect_tqdm():
             for num, p in enumerate(tqdm(portals)):
+                self.logger.info(f'正在匹配 {num} {p["Name"]}')
                 portal_image_path = self.config.portal_images_dir.joinpath(
                     parse_portal_filename(p['Image'], p['Latitude'], p['Longitude']))
                 if not portal_image_path.exists():

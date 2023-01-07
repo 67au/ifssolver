@@ -71,7 +71,7 @@ class PortalDownloader:
                            num: int,
                            ) -> Tuple[int, Union[str, Exception, None]]:
         async with semaphore:
-            if not url.startswith('http://'):
+            if not url.startswith('http'):
                 return num, 'Not URL'
             try:
                 resp = await client.get(url)
