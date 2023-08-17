@@ -24,7 +24,7 @@ class SiftExtractor(FeatureExtractor):
         self.platformid = platformid
         self.deviceid = deviceid
 
-    @lru_cache(maxsize=32)
+    @lru_cache(maxsize=128)
     def _create_sift_plan(self, shape, dtype) -> sift.SiftPlan:
         return sift.SiftPlan(
             shape=shape,
@@ -36,9 +36,9 @@ class SiftExtractor(FeatureExtractor):
 
     def get_image_features(self,
                            image_path: PathType,
-                           **kwargs
+                           return_pack: bool = False,
                            ) -> FeaturesType:
-        image = cv.imread(str(image_path), cv.IMREAD_GRAYSCALE)
+        image = self.get_image(image_path)
         if max(image.shape) > 768:
             siftp = self._create_sift_plan.__wrapped__(self, image.shape, image.dtype)
         else:
@@ -54,9 +54,17 @@ class SiftExtractor(FeatureExtractor):
     def get_features(self,
                      image_path: PathType,
                      cache_path: PathType = None,
-                     **kwargs
+                     return_pack: bool = True,
                      ) -> Union[FeaturesType, PackType]:
         return super().get_features(image_path, cache_path, return_pack=True)
+
+    def get_features_and_shape(self,
+                               image_path: PathType,
+                               cache_path: PathType = None,
+                               return_pack: bool = True,
+                               scale: bool = True,
+                               ) -> Tuple[Union[FeaturesType, PackType, None], tuple]:
+        return super().get_features_and_shape(image_path, cache_path, return_pack=True)
 
 
 class SiftMatcher(FeatureMatcher):
@@ -76,7 +84,7 @@ class SiftMatcher(FeatureMatcher):
                            src_features: FeaturesType,
                            dst_features: FeaturesType,
                            ) -> List[np.ndarray]:
-        h, w, _ = src_shape
+        h, w, *_ = src_shape
         src_cnt = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
         dst_contours = []
         kp = dst_features
@@ -87,7 +95,7 @@ class SiftMatcher(FeatureMatcher):
             src_des, dst_des = matches[:, 0], matches[:, 1]
             src_pts = src_des[['x', 'y']].astype([('x', '<f4'), ('y', '<f4')]).view('<f4').reshape(-1, 2)
             dst_pts = dst_des[['x', 'y']].astype([('x', '<f4'), ('y', '<f4')]).view('<f4').reshape(-1, 2)
-            M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC, 10.0)
+            M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC, 5.0)
             if M is None:
                 break
             dst = cv.perspectiveTransform(src_cnt, M)

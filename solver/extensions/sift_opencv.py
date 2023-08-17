@@ -9,7 +9,6 @@ from .base import Matches, FeatureExtractor, FeatureMatcher
 
 
 class SiftExtractor(FeatureExtractor):
-
     method = 'opencv'
 
     def __init__(self, enable_cache: bool = True):
@@ -18,9 +17,9 @@ class SiftExtractor(FeatureExtractor):
 
     def get_image_features(self,
                            image_path: PathType,
-                           return_pack: bool = False
+                           return_pack: bool = False,
                            ) -> Union[FeaturesType, PackType]:
-        image = cv.imread(str(image_path), cv.IMREAD_GRAYSCALE)
+        image = self.get_image(image_path)
         kp, des = self._sift.detectAndCompute(image, None)
         return pack_features(kp, des) if return_pack else (kp, des)
 
@@ -37,6 +36,13 @@ class SiftExtractor(FeatureExtractor):
                      ) -> Union[FeaturesType, PackType, None]:
         return super().get_features(image_path, cache_path, return_pack=return_pack)
 
+    def get_features_and_shape(self,
+                               image_path: PathType,
+                               cache_path: PathType = None,
+                               return_pack: bool = False,
+                               ) -> Tuple[Union[FeaturesType, PackType, None], tuple]:
+        return super().get_features_and_shape(image_path, cache_path, return_pack=return_pack)
+
 
 class BFMatcher(FeatureMatcher):
 
@@ -50,7 +56,7 @@ class BFMatcher(FeatureMatcher):
                            ) -> List[np.ndarray]:
         src_kp, src_des = src_features
         dst_kp, dst_des = dst_features
-        h, w, _ = src_shape
+        h, w, *_ = src_shape
         src_cnt = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
         matches = Matches(
             np.array(sorted(

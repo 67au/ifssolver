@@ -61,6 +61,10 @@ class ConfigProxy:
         return self.output_sub_dir.joinpath('match_result.jpg')
 
     @property
+    def match_progress_pkl(self) -> Path:
+        return self.output_sub_dir.joinpath('match_progress.pkl')
+
+    @property
     def passcode_jpg(self) -> Path:
         return self.output_sub_dir.joinpath('passcode.jpg')
 

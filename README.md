@@ -4,15 +4,15 @@
 
 ## Requirements
 - `python>=3.7`
-- `aiofiles~=0.8.0`
-- `httpx~=0.23.0`
-- `httpx-socks[asyncio]~=0.7.4`
+- `aiofiles`
+- `httpx`
+- `httpx-socks[asyncio]`
 - `intel-map-client==0.2.1`
-- `opencv-python~=4.5.5.64`
-- `tqdm~=4.64.0`
+- `opencv-python`
+- `tqdm`
 
-- `pyopencl==2022.1.5 [optional]`
-- `silx==1.0.0 [optional]`
+- `pyopencl [optional]`
+- `silx [optional]`
 
 > 如果需要使用 GPU 加速的 sift 算法，请安装上面可选依赖和显卡对应的驱动，并使用 [clinfo](https://github.com/Oblomov/clinfo) 等工具检查 opencl 的状态，确保可用。安装 pyopencl 的方式可以参考 [这里](https://documen.tician.de/pyopencl/misc.html#installation) 。
 
@@ -42,23 +42,24 @@ pip install -r requirements-silx.txt
 
 ```
 $ python3 ifssolver.py --help
-usage: ifssolver.py [-h] [--config filename]
-                    [--download-csv | --download-img | --download-all]
-                    [--split] [--draw] [--auto] [--metadata METADATA]
-                    [--method opencv] [--no-clean]
+usage: ifssolver.py [-h] [--config filename] [--download-csv | --download-img | --download-all] [--split]
+                    [--draw] [--metadata METADATA] [--method opencv] [--no-clean] [--save-progress]        
 
 ifssolver
 
-optional arguments:
+options:
   -h, --help           show this help message and exit
   --config filename    Configure File, default = 'config.ini'
   --download-csv       download metadata
   --download-img       download image by metadata
   --download-all       download image after updating metadata
-  --auto               AUTO
   --metadata METADATA  use specified METADATA
   --method opencv      sift algorithm provider, opencv or silx
   --no-clean           no clean cache file
+  --save-progress      save split progress
+
+  --split              split ifs image
+  --draw               draw result
 ```
 
 ### 创建配置文件
@@ -110,7 +111,8 @@ python3 ifssolver.py --auto
   - `opencv`: opencv-python 中的 sift 
   - `silx`： silx-kit 项目中支持 GPU 加速的 sift 
 - `--no-clean`: 默认禁用，使用该参数可以跳过覆盖缓存文件。
-- `--metadata`: 指定`METADATA` csv 文件以代替利用 Cookies 从 IntelMap 上下载的数据
+- `--metadata`: 指定 `METADATA` csv 文件以代替利用 Cookies 从 IntelMap 上下载的数据
+- `--save-progress`: 将保存 split 的进度
 
 ## Note
 

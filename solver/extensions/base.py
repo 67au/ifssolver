@@ -10,16 +10,18 @@ from ..types import PathType, FeaturesType, PackType
 
 
 class FeatureExtractor:
-
     method = 'default'
 
     def __init__(self, enable_cache: bool = True):
         self.enable_cache = enable_cache
         self.logger = logging.getLogger(__name__)
 
+    def get_image(self, image_path: PathType) -> np.ndarray:
+        return cv.imread(str(image_path), cv.IMREAD_GRAYSCALE)
+
     def get_image_features(self,
                            image_path: PathType,
-                           return_pack: bool = False
+                           return_pack: bool = False,
                            ) -> Union[FeaturesType, PackType]:
         pass
 
@@ -48,6 +50,13 @@ class FeatureExtractor:
         else:
             self.logger.warning(f'目标文件({str(image_path)}不存在，无法计算)')
             return None
+
+    def get_features_and_shape(self,
+                               image_path: PathType,
+                               cache_path: PathType = None,
+                               return_pack: bool = False,
+                               ) -> Tuple[Union[FeaturesType, PackType, None], tuple]:
+        return self.get_features(image_path, cache_path, return_pack), self.get_image(image_path).shape
 
 
 class FeatureMatcher:
