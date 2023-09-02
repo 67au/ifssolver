@@ -99,12 +99,12 @@ class Solver:
         match = matcher_func(src_features=features, src_shape=shape)
         return match
 
-    def _get_matches(self,
+    def get_matches(self,
                      portals: List[dict],
                      extractor: FeatureExtractor,
                      matcher_func: Callable,
                      start: int = 0,
-                     ) -> Iterator[Tuple[int, np.ndarray]]:
+                     ) -> List[Tuple[int, np.ndarray]]:
         errors_list = []
         with logging_redirect_tqdm(), self.match_state:
             for num, p in enumerate(tqdm(portals[start:])):
@@ -119,13 +119,14 @@ class Solver:
                     self.match_state.save_index(num)
                     for cnt in self._get_match(extractor, portal_image_path, matcher_func):
                         self.match_state.save_cnt(num, cnt)
-                        yield num, cnt
 
         if any(errors_list):
             with open(self.config.split_errors_txt, 'w', encoding='utf-8') as f:
                 f.writelines(f"{n}, {portals[n]['Name']}, \"{e}\"\n" for n, e in errors_list)
             self.logger.warning(
                 f'有 {len(errors_list)} 张 Portal 照片无法计算，请查看 {str(self.config.split_errors_txt)}')
+
+        return self.match_state.match_cnts
 
     MATCH_FIELD = ['col', 'row', 'lat', 'lng', 'x', 'y', 'name']
 
@@ -170,15 +171,12 @@ class Solver:
         self.logger.info('计算 Portal 图像')
         portals = self._downloader.read_portals_from_csv(self.metadata_csv)
 
-        match_cnts = self.match_state.match_cnts if self.save_progress else []
-        start = self.match_state.index if self.save_progress else 0
-        for num, cnt in self._get_matches(
+        match_cnts = self.get_matches(
             portals,
             extractor,
             partial(matcher.get_match_contours, dst_features=ifs_image_features),
-            start
-        ):
-            match_cnts.append((num, cnt))
+            self.match_state.index
+        )
 
         centers = np.array([get_cnt_center(cnt[1]) for cnt in match_cnts])
         grids = sort_grid(centers, self.config.column)

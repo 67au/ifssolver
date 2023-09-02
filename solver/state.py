@@ -46,7 +46,7 @@ class MatchState:
 
     @property
     def index(self) -> int:
-        return self._state.get('index', 0)
+        return self._state.get('index', 0) if self.save_progress else 0
 
     @index.setter
     def index(self, value):
@@ -54,7 +54,7 @@ class MatchState:
 
     @property
     def match_cnts(self) -> List[Tuple[int, np.ndarray]]:
-        return self._state.get('match_cnts', [])
+        return self._state.get('match_cnts', []) if self.save_progress else 0
 
     @staticmethod
     def get_file_hash(file_path: PathType):
